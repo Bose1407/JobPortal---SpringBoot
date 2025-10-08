@@ -124,12 +124,15 @@ public class JobPosting {
 		this.applicants = applicants;
 	}
 
-	@ManyToMany
-    @JoinTable(
-        name = "job_applicants",
-        joinColumns = @JoinColumn(name = "job_id"),
-        inverseJoinColumns = @JoinColumn(name = "seeker_id")
-    )
+	// @ManyToMany
+    // @JoinTable(
+    //     name = "job_applicants",
+    //     joinColumns = @JoinColumn(name = "job_id"),
+    //     inverseJoinColumns = @JoinColumn(name = "seeker_id")
+    // )
+	// @JsonBackReference
+    // private List<JobSeekerEntity> applicants;
+	@ManyToMany(mappedBy = "appliedJobs")
 	@JsonBackReference
-    private List<JobSeekerEntity> applicants;
+	private List<JobSeekerEntity> applicants;
 }

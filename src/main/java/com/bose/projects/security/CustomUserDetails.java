@@ -30,25 +30,28 @@ public class CustomUserDetails implements UserDetailsService {
         Optional<JobRecruiter> recruiterOpt = jobRecruiterRepo.findByEmail(email);
         if (recruiterOpt.isPresent()) {
             JobRecruiter recruiter = recruiterOpt.get();
-            return User.builder()
-                    .username(recruiter.getEmail())
-                    .password(recruiter.getPassword())
-                    .roles("RECRUITER")
-                    .build();
+            return new CustomUserPrincipal(
+                    recruiter.getId(),
+                    recruiter.getEmail(),
+                    recruiter.getPassword(),
+                    List.of(new SimpleGrantedAuthority("ROLE_RECRUITER"))
+            );
         }
 
         Optional<JobSeekerEntity> seekerOpt = jobSeekerRepo.findByEmail(email);
         if (seekerOpt.isPresent()) {
             JobSeekerEntity seeker = seekerOpt.get();
-            return User.builder()
-                    .username(seeker.getEmail())
-                    .password(seeker.getPassword())
-                    .roles("SEEKER")
-                    .build();
+            return new CustomUserPrincipal(
+                    seeker.getId(),
+                    seeker.getEmail(),
+                    seeker.getPassword(),
+                    List.of(new SimpleGrantedAuthority("ROLE_SEEKER"))
+            );
         }
 
         throw new UsernameNotFoundException("User not found with email: " + email);
     }
+
 
 
 }

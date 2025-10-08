@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bose.projects.dto.RecruiterRegisterDto;
 import com.bose.projects.entity.JobPosting;
+import com.bose.projects.entity.JobSeekerEntity;
+import com.bose.projects.repo.JobSeekerRepo;
 import com.bose.projects.services.RecruiterService;
 
 import jakarta.validation.Valid;
@@ -26,6 +28,7 @@ import com.bose.projects.dto.JobPostingDto;
 public class RecruiterController {
 	@Autowired
 	private RecruiterService recruiterService;
+	private JobSeekerRepo jobSeekerRepo;
 	
 	@PostMapping("/register")
 	public ResponseEntity<Map<String, Object>> registerRecruiter(@RequestBody @Valid RecruiterRegisterDto  recruiter) {
@@ -46,6 +49,12 @@ public class RecruiterController {
 	@GetMapping("/job/{jobId}/applicants")
 	public ResponseEntity<?>getApplicantsForSpecificJob(@PathVariable Long jobId){
 		return ResponseEntity.status(HttpStatus.OK).body(recruiterService.getApplicantsOfParticularJob(jobId));
+	}
+	@GetMapping("/find/{user_id}")
+	public ResponseEntity<JobSeekerEntity> getUserById(@PathVariable Long user_id) {
+	    return jobSeekerRepo.findById(user_id)
+	        .map(ResponseEntity::ok)
+	        .orElse(ResponseEntity.notFound().build());
 	}
 
 }

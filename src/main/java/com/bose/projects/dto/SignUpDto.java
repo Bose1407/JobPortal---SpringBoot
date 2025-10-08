@@ -9,8 +9,6 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class SignUpDto {
 	
     public String getName() {

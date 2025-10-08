@@ -15,8 +15,6 @@ import com.bose.projects.exceptions.FailedToApplyJobException;
 import com.bose.projects.exceptions.JobNotFoundException;
 import com.bose.projects.exceptions.SeekerCreateException;
 import com.bose.projects.exceptions.SeekerNotFoundException;
-import com.bose.projects.repo.JobSeekerRepo;
-import com.bose.projects.repo.RoleRepo;
 
 import jakarta.transaction.Transactional;
 
@@ -61,22 +59,29 @@ public class SeekerService {
 		}
 	}
 	@Transactional
-	public Map<String, Object> applyForJob(Long seekerId,Long jobId) {
-		Map<String,Object> response = new HashMap<>();
-		JobPosting job = jobPostingRepo.findById(jobId).orElseThrow(()->new JobNotFoundException("No Job Found with Id :"+jobId));
-		JobSeekerEntity seeker = jobSeekerRepo.findById(seekerId).orElseThrow(()->new SeekerNotFoundException("No Seeker found with id :"+seekerId));
+public Map<String, Object> applyForJob(Long seekerId, Long jobId) {
+    Map<String,Object> response = new HashMap<>();
+
+    JobPosting job = jobPostingRepo.findById(jobId)
+            .orElseThrow(() -> new JobNotFoundException("No Job Found with Id: " + jobId));
+    JobSeekerEntity seeker = jobSeekerRepo.findById(seekerId)
+            .orElseThrow(() -> new SeekerNotFoundException("No Seeker found with id: " + seekerId));
+
+    if(seeker.getAppliedJobs().contains(job)) {
+        response.put("Status", "409");
+        response.put("Error", "Already applied for this job");
+        return response;
+    }
+
+    seeker.getAppliedJobs().add(job); // Only update seeker side
+    jobSeekerRepo.save(seeker);       // Persist applied job
+
+    response.put("Status", "203");
+    response.put("Message", "Successfully applied");
+    return response;
+}
+
 		
-		if(!seeker.getAppliedJobs().contains(job)) {
-			seeker.getAppliedJobs().add(job);
-			job.getApplicants().add(seeker);
-			JobPosting jobApplied = jobPostingRepo.save(job);
-			jobSeekerRepo.save(seeker);
-			response.put("Status", "203");
-			response.put("Successfully Applied", jobApplied);
-			return response;
-			
-		}
-		return (Map<String, Object>) response.put("Already Registered", new FailedToApplyJobException("Failed to apply the Job"));
-	}
+		
 
 }
