@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  mysql-db:
+    image: mysql:8
+    container_name: jobportal-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Bose@8283
+      MYSQL_DATABASE: job_portal
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  springboot-app:
+    build: .
+    container_name: jobportal-app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/job_portal
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Bose@8283
+    depends_on:
+      - mysql-db
+
+volumes:
+  mysql-data:
